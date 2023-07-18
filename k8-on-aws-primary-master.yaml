@@ -1,0 +1,85 @@
+---
+- hosts: masters_first
+  become: yes
+  tasks:
+    - name: Sleep for 10 minutes and continue with play
+      ansible.builtin.wait_for:
+        timeout: 600
+
+   - name: Kubectl Install
+     apt:
+       name: kubectl
+       state: present
+       force: yes
+
+   - name: Start the cluster
+     shell: kubeadm init --pod-network-cidr=192.168.0.0/16 --cri-socket /run/cri-dockerd.sock --control-plane-endpoint "{{ master_lb }}":6443 --upload-certs >> cluster.txt
+     register: result
+     args:
+      chdir: $HOME
+      creates: cluster.txt
+  
+   - name: Sleep for 20 seconds
+     wait_for:
+      timeout: 20
+
+   - name: Create .kube directory
+     become: yes
+     become_user: ubuntu
+     file:
+       path: $HOME/.kube
+       state: directory
+       mode: 0755
+
+   - name: Check admin.conf file exists.
+     stat:
+       path: /etc/kubernetes/admin.conf
+     register: k8s_conf
+
+   - name: Copy admin.conf to user's kube config
+     copy:
+       src: /etc/kubernetes/admin.conf
+       dest: /home/ubuntu/.kube/config
+       remote_src: yes
+       owner: ubuntu
+     when: k8s_conf.stat.exists
+
+   - name: Install Pod network
+     become_user: ubuntu
+     shell: kubectl apply -f https://raw.githubusercontent.com/flannel-io/flannel/master/Documentation/kube-flannel.yml >> pod_setup.txt
+     args:
+       chdir: $HOME
+       creates: pod_setup.txt
+
+   - name: get default kubeadm config
+     shell: kubeadm config print init-defaults > kubeadm_config.yaml
+     args:
+       chdir: $HOME
+       creates: kubeadm-config.yaml
+
+   - name: Add cri socket to kubeadm config
+     replace:
+      path: $HOME/kubeadm_config.yaml
+      regexp: "/var/run/containerd/containerd.sock"
+      replace: "/run/cri-dockerd.sock"
+
+   - name: Create a new certificate key
+     shell: kubeadm init phase upload-certs --upload-certs --config $HOME/kubeadm_config.yaml
+     register: join_certificate_key
+
+   - name: Get join command
+     shell: kubeadm token create --print-join-command --certificate-key "{{ join_certificate_key.stdout_lines[2] }}"
+     register: join_command
+
+   - debug:
+      var: join_command
+
+   - name: Copy join command to local file
+     local_action: copy content="{{ join_command.stdout_lines[0] }}" dest="./join_command"
+
+   - name: Get worker node join command
+     shell: kubeadm token create --print-join-command
+     register: join_node_command
+
+   - name: Copy worker node join command to local file
+     local_action: copy content="{{ join_node_command.stdout_lines[0] }}" dest="./join_node_command"

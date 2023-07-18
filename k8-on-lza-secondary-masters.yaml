@@ -1,0 +1,50 @@
+---
+- hosts: masters_others
+  become: yes
+  tasks:
+   - name: Sleep for 15 minutes and continue with play
+     ansible.builtin.wait_for:
+       timeout: 900
+
+   - name: Kubectl Install
+     apt:
+       name: kubectl
+       state: present
+       force: yes
+
+   - name: Copy the master join command to server location
+     copy: src=join_command dest=/tmp/join_command.sh mode=0777
+
+   - name: Add cri socket to kubelet
+     replace:
+      path: /tmp/join_command.sh
+      regexp: "--token"
+      replace: "--cri-socket='/run/cri-dockerd.sock' --token"
+
+   - name: Join the master node to cluster
+     command: sh /tmp/join_command.sh
+
+   - name: Sleep for 20 seconds
+     wait_for:
+      timeout: 20
+
+   - name: Create .kube directory
+     become: yes
+     become_user: ubuntu
+     file:
+       path: $HOME/.kube
+       state: directory
+       mode: 0755
+
+   - name: Check admin.conf file exists.
+     stat:
+       path: /etc/kubernetes/admin.conf
+     register: k8s_conf
+
+   - name: Copy admin.conf to user's kube config
+     copy:
+       src: /etc/kubernetes/admin.conf
+       dest: /home/ubuntu/.kube/config
+       remote_src: yes
+       owner: ubuntu
+     when: k8s_conf.stat.exists
