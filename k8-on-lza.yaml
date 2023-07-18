@@ -1,0 +1,9 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+   - name: Docker Installation
+     apt:
+       name: docker.io
+       state: present
+       update_cache: true
