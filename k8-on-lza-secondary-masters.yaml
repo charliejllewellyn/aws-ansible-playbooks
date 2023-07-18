@@ -1,5 +1,5 @@
 ---
-- hosts: masters_others
+- hosts: all
   become: yes
   tasks:
    - name: Sleep for 15 minutes and continue with play

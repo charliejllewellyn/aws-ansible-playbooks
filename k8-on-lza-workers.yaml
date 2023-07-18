@@ -1,5 +1,5 @@
 ---
-- hosts: workers
+- hosts: all
   become: yes
   tasks:
     - name: Sleep for 20 minutes and continue with play
