@@ -16,7 +16,7 @@
      shell: kubeadm init --pod-network-cidr=192.168.0.0/16 --cri-socket /run/cri-dockerd.sock --control-plane-endpoint "{{ master_lb }}":6443 --upload-certs >> cluster.txt
      register: result
      args:
-      chdir: $HOME
+      chdir: /root/
       creates: cluster.txt
   
    - name: Sleep for 20 seconds
@@ -27,7 +27,7 @@
      become: yes
      become_user: ubuntu
      file:
-       path: $HOME/.kube
+       path: /root//.kube
        state: directory
        mode: 0755
 
@@ -48,23 +48,23 @@
      become_user: ubuntu
      shell: kubectl apply -f https://raw.githubusercontent.com/flannel-io/flannel/master/Documentation/kube-flannel.yml >> pod_setup.txt
      args:
-       chdir: $HOME
+       chdir: /root/
        creates: pod_setup.txt
 
    - name: get default kubeadm config
      shell: kubeadm config print init-defaults > kubeadm_config.yaml
      args:
-       chdir: $HOME
+       chdir: /root/
        creates: kubeadm-config.yaml
 
    - name: Add cri socket to kubeadm config
      replace:
-      path: $HOME/kubeadm_config.yaml
+      path: /root//kubeadm_config.yaml
       regexp: "/var/run/containerd/containerd.sock"
       replace: "/run/cri-dockerd.sock"
 
    - name: Create a new certificate key
-     shell: kubeadm init phase upload-certs --upload-certs --config $HOME/kubeadm_config.yaml
+     shell: kubeadm init phase upload-certs --upload-certs --config /root//kubeadm_config.yaml
      register: join_certificate_key
 
    - name: Get join command
