@@ -2,9 +2,9 @@
 - hosts: all
   become: yes
   tasks:
-  #  - name: Sleep for 10 minutes and continue with play
-  #    ansible.builtin.wait_for:
-  #      timeout: 600
+   - name: Sleep for 10 minutes and continue with play
+     ansible.builtin.wait_for:
+       timeout: 600
 
    - name: Kubectl Install
      apt:
