@@ -2,9 +2,9 @@
 - hosts: all
   become: yes
   tasks:
-    - name: Sleep for 20 minutes and continue with play
-      ansible.builtin.wait_for:
-        timeout: 1200
+    # - name: Sleep for 20 minutes and continue with play
+    #   ansible.builtin.wait_for:
+    #     timeout: 1200
 
     - name: Copy the worker join command to server location
       copy: src=join_node_command dest=/tmp/join_node_command.sh mode=0777
