@@ -99,8 +99,8 @@
      shell: pip3 install boto3
      register: result
 
-   - name: Telnet
+   - name: Install lsof
      apt:
-       name: telnet
+       name: lsof
        state: present
        update_cache: true

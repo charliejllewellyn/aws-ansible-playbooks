@@ -3,6 +3,11 @@
   become: yes
   tasks:
 
+   - name: ensures dir exists
+     file: 
+       path: "/run/flannel"
+       state: directory
+
    - name: Creating a file with content
      copy:
        dest: "/run/flannel/subnet.env"
