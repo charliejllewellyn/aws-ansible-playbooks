@@ -23,6 +23,8 @@
      args:
       chdir: /root/
       creates: cluster.txt
+     delay: 10
+     retries: 12
   
    - name: Sleep for 20 seconds
      wait_for:
@@ -35,11 +37,15 @@
        path: /home/ubuntu/.kube
        state: directory
        mode: 0755
+     delay: 10
+     retries: 12
 
    - name: Check admin.conf file exists.
      stat:
        path: /etc/kubernetes/admin.conf
      register: k8s_conf
+     delay: 10
+     retries: 12
 
    - name: Copy admin.conf to user's kube config
      copy:
@@ -48,6 +54,8 @@
        remote_src: yes
        owner: ubuntu
      when: k8s_conf.stat.exists
+     delay: 10
+     retries: 12
 
    - name: Install Pod network
      become_user: ubuntu
@@ -57,26 +65,36 @@
      args:
        chdir: /home/ubuntu/
        creates: pod_setup.txt
+     delay: 10
+     retries: 12
 
    - name: get default kubeadm config
      shell: kubeadm config print init-defaults > kubeadm_config.yaml
      args:
        chdir: /root/
        creates: kubeadm-config.yaml
+     delay: 10
+     retries: 12
 
    - name: Add cri socket to kubeadm config
      replace:
       path: /root/kubeadm_config.yaml
       regexp: "/var/run/containerd/containerd.sock"
       replace: "/run/cri-dockerd.sock"
+     delay: 10
+     retries: 12
 
    - name: Create a new certificate key
      shell: kubeadm init phase upload-certs --upload-certs --config /root//kubeadm_config.yaml
      register: join_certificate_key
+     delay: 10
+     retries: 12
 
    - name: Get join command
      shell: kubeadm token create --print-join-command --certificate-key "{{ join_certificate_key.stdout_lines[2] }}"
      register: join_command
+     delay: 10
+     retries: 12
 
    - debug:
       var: join_command
@@ -87,9 +105,13 @@
    - name: Get worker node join command
      shell: kubeadm token create --print-join-command
      register: join_node_command
+     delay: 10
+     retries: 12
 
    - name: Copy worker node join command to local file
      local_action: copy content="{{ join_node_command.stdout_lines[0] }}" dest="./join_node_command"
+     delay: 10
+     retries: 12
 
    - name: Upload join_node_command to S3
      amazon.aws.s3_object:
@@ -97,6 +119,8 @@
        object: /join_node_command
        src: join_node_command
        mode: put
+     delay: 10
+     retries: 12
 
    - name: Upload join_command to S3
      amazon.aws.s3_object:
@@ -104,3 +128,5 @@
        object: /join_command
        src: join_command
        mode: put
+     delay: 10
+     retries: 12
