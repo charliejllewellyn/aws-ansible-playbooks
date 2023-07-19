@@ -11,7 +11,7 @@
        name: kubectl
        state: present
        force: yes
-     until: apt_status is success
+     until: apt_status|success
      delay: 10
      retries: 12
 
