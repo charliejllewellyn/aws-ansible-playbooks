@@ -2,10 +2,7 @@
 - hosts: all
   become: yes
   tasks:
-    # - name: Sleep for 20 minutes and continue with play
-    #   ansible.builtin.wait_for:
-    #     timeout: 1200
-
+  
    - name: Download join_command from S3
      amazon.aws.s3_object:
        bucket: "{{ bucket }}"
