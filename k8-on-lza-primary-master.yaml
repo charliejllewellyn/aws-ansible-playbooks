@@ -29,7 +29,7 @@
      become: yes
      become_user: ubuntu
      file:
-       path: /root//.kube
+       path: /home/ubuntu/.kube
        state: directory
        mode: 0755
 
@@ -50,7 +50,7 @@
      become_user: ubuntu
      shell: kubectl apply -f https://raw.githubusercontent.com/flannel-io/flannel/master/Documentation/kube-flannel.yml >> pod_setup.txt
      args:
-       chdir: /root/
+       chdir: /home/ubuntu/
        creates: pod_setup.txt
 
    - name: get default kubeadm config
@@ -61,7 +61,7 @@
 
    - name: Add cri socket to kubeadm config
      replace:
-      path: /root//kubeadm_config.yaml
+      path: /root/kubeadm_config.yaml
       regexp: "/var/run/containerd/containerd.sock"
       replace: "/run/cri-dockerd.sock"
 
