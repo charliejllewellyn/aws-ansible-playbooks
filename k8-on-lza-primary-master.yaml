@@ -51,6 +51,8 @@
 
    - name: Install Pod network
      become_user: ubuntu
+     become_method: su
+     become_flags: '-s /bin/sh'
      shell: kubectl apply -f https://raw.githubusercontent.com/flannel-io/flannel/master/Documentation/kube-flannel.yml >> pod_setup.txt
      args:
        chdir: /home/ubuntu/
