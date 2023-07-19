@@ -6,8 +6,17 @@
     #   ansible.builtin.wait_for:
     #     timeout: 1200
 
-    - name: Copy the worker join command to server location
-      copy: src=join_node_command dest=/tmp/join_node_command.sh mode=0777
+   - name: Download join_command from S3
+     amazon.aws.s3_object:
+       bucket: "{{ bucket }}"
+       object: "{{ bucket_prefix }}/join_node_command"
+       dest: /tmp/join_node_command.sh
+       mode: get
+
+   - name: Change file ownership, group and permissions
+     ansible.builtin.file:
+       path: /tmp/join_node_command.sh
+       mode: '0777'
 
     - name: Add cri socket to kubelet
       replace:
