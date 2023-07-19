@@ -15,7 +15,7 @@
    - name: Download join_command from S3
      amazon.aws.s3_object:
        bucket: "{{ bucket }}"
-       object: "{{ bucket_prefix }}/join_command"
+       object: join_command
        dest: /tmp/join_command.sh
        mode: get
 
