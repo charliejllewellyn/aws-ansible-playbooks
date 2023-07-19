@@ -9,24 +9,24 @@
    - name: Wait for /var/lib/dpkg/lock-frontend to be released 
      shell: while lsof /var/lib/dpkg/lock-frontend ; do sleep 10; done;
 
-  #  - name: Kubectl Install
-  #    apt:
-  #      name: kubectl
-  #      state: present
-  #      force: yes
-  #    delay: 10
-  #    retries: 12
+   - name: Kubectl Install
+     apt:
+       name: kubectl
+       state: present
+       force: yes
+     delay: 10
+     retries: 12
 
-  #  - name: Start the cluster
-  #    shell: kubeadm init --pod-network-cidr=192.168.0.0/16 --cri-socket /run/cri-dockerd.sock --control-plane-endpoint "{{ master_lb }}":6443 --upload-certs >> cluster.txt
-  #    register: result
-  #    args:
-  #     chdir: /root/
-  #     creates: cluster.txt
+   - name: Start the cluster
+     shell: kubeadm init --pod-network-cidr=192.168.0.0/16 --cri-socket /run/cri-dockerd.sock --control-plane-endpoint "{{ master_lb }}":6443 --upload-certs >> cluster.txt
+     register: result
+     args:
+      chdir: /root/
+      creates: cluster.txt
   
-  #  - name: Sleep for 20 seconds
-  #    wait_for:
-  #     timeout: 20
+   - name: Sleep for 20 seconds
+     wait_for:
+      timeout: 20
 
    - name: Create .kube directory
      become: yes
