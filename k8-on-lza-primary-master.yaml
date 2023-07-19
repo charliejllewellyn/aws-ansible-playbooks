@@ -13,6 +13,8 @@
        force: yes
      delay: 10
      retries: 12
+     register: result
+     until: result.rc == 0
 
    - name: Start the cluster
      shell: kubeadm init --pod-network-cidr=192.168.0.0/16 --cri-socket /run/cri-dockerd.sock --control-plane-endpoint "{{ master_lb }}":6443 --upload-certs >> cluster.txt
