@@ -12,8 +12,17 @@
        state: present
        force: yes
 
-   - name: Copy the master join command to server location
-     copy: src=join_command dest=/tmp/join_command.sh mode=0777
+   - name: Download join_command from S3
+     amazon.aws.s3_object:
+       bucket: "{{ bucket }}"
+       object: "{{ bucket_prefix }}"/join_command
+       dest: /tmp/join_command.sh
+       mode: get
+
+   - name: Change file ownership, group and permissions
+     ansible.builtin.file:
+       path: /tmp/join_command.sh
+       mode: '0777'
 
    - name: Add cri socket to kubelet
      replace:

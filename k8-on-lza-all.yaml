@@ -91,6 +91,14 @@
       state: started
       enabled: yes
 
+   - name: Install Ansible AWS tools
+     shell: ansible-galaxy collection install amazon.aws
+     register: result
+
+   - name: Install boto3
+     shell: pip3 install boto3
+     register: result
+
    - name: Telnet
      apt:
        name: telnet
