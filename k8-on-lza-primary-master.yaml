@@ -6,12 +6,14 @@
   #    ansible.builtin.wait_for:
   #      timeout: 600
 
+   - name: Wait for /var/lib/dpkg/lock-frontend to be released 
+     shell: while lsof /var/lib/dpkg/lock-frontend ; do sleep 10; done;
+
    - name: Kubectl Install
      apt:
        name: kubectl
        state: present
        force: yes
-     until: apt_status|success
      delay: 10
      retries: 12
 
