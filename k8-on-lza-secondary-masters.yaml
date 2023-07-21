@@ -6,6 +6,12 @@
   #    ansible.builtin.wait_for:
   #      timeout: 900
 
+   - name: Wait for previous ansible run to complete
+     shell: while ps -ef | grep -i k8-on-lza-all.yaml | grep -v 'grep' ; do sleep 10; done;
+
+   - name: Wait for /var/lib/dpkg/lock-frontend to be released 
+     shell: while lsof /var/lib/dpkg/lock-frontend ; do sleep 10; done;
+
    - name: Kubectl Install
      apt:
        name: kubectl

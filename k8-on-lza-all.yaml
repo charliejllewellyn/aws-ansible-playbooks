@@ -2,6 +2,12 @@
 - hosts: all
   become: yes
   tasks:
+   - name: Install lsof
+     apt:
+       name: lsof
+       state: present
+       update_cache: true
+
    - name: Docker Installation
      apt:
        name: docker.io
@@ -98,9 +104,3 @@
    - name: Install boto3
      shell: pip3 install boto3
      register: result
-
-   - name: Install lsof
-     apt:
-       name: lsof
-       state: present
-       update_cache: true
