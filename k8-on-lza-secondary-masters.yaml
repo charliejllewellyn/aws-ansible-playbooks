@@ -17,6 +17,8 @@
        name: kubectl
        state: present
        force: yes
+     delay: 10
+     retries: 12
 
    - name: Download join_command from S3
      amazon.aws.s3_object:
@@ -24,24 +26,34 @@
        object: join_command
        dest: /tmp/join_command.sh
        mode: get
+     delay: 10
+     retries: 12
 
    - name: Change file ownership, group and permissions
      ansible.builtin.file:
        path: /tmp/join_command.sh
        mode: '0777'
+     delay: 10
+     retries: 12
 
    - name: Add cri socket to kubelet
      replace:
       path: /tmp/join_command.sh
       regexp: "--token"
       replace: "--cri-socket='/run/cri-dockerd.sock' --token"
+     delay: 10
+     retries: 12
 
    - name: Join the master node to cluster
      command: sh /tmp/join_command.sh
+     delay: 10
+     retries: 12
 
    - name: Sleep for 20 seconds
      wait_for:
       timeout: 20
+     delay: 10
+     retries: 12
 
    - name: Create .kube directory
      become: yes
@@ -50,11 +62,15 @@
        path: $HOME/.kube
        state: directory
        mode: 0755
+     delay: 10
+     retries: 12
 
    - name: Check admin.conf file exists.
      stat:
        path: /etc/kubernetes/admin.conf
      register: k8s_conf
+     delay: 10
+     retries: 12
 
    - name: Copy admin.conf to user's kube config
      copy:
@@ -63,3 +79,5 @@
        remote_src: yes
        owner: ubuntu
      when: k8s_conf.stat.exists
+     delay: 10
+     retries: 12
