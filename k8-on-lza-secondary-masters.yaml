@@ -12,6 +12,9 @@
    - name: Wait for /var/lib/dpkg/lock-frontend to be released 
      shell: while lsof /var/lib/dpkg/lock-frontend ; do sleep 10; done;
 
+   - name: Wait for /var/lib/apt/lists/lock to be released 
+     shell: while lsof /var/lib/apt/lists/lock ; do sleep 10; done;
+
    - name: Kubectl Install
      apt:
        name: kubectl
