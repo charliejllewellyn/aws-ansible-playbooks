@@ -79,6 +79,8 @@
      args:
        chdir: /home/ubuntu/
        creates: pod_setup.txt
+     register: lsresult
+     until: "lsresult is not failed"
      delay: 10
      retries: 12
 
@@ -87,6 +89,8 @@
      args:
        chdir: /root/
        creates: kubeadm-config.yaml
+     register: lsresult
+     until: "lsresult is not failed"
      delay: 10
      retries: 12
 
@@ -101,12 +105,14 @@
    - name: Create a new certificate key
      shell: kubeadm init phase upload-certs --upload-certs --config /root//kubeadm_config.yaml
      register: join_certificate_key
+     until: "join_certificate_key is not failed"
      delay: 10
      retries: 12
 
    - name: Get join command
      shell: kubeadm token create --print-join-command --certificate-key "{{ join_certificate_key.stdout_lines[2] }}"
      register: join_command
+     until: "join_command is not failed"
      delay: 10
      retries: 12
 
@@ -119,6 +125,7 @@
    - name: Get worker node join command
      shell: kubeadm token create --print-join-command
      register: join_node_command
+     until: "join_node_command is not failed"
      delay: 10
      retries: 12
 
@@ -133,6 +140,8 @@
        object: /join_node_command
        src: join_node_command
        mode: put
+     register: lsresults
+     until: "lsresults is not failed"
      delay: 10
      retries: 12
 
@@ -142,5 +151,7 @@
        object: /join_command
        src: join_command
        mode: put
+     register: lsresults
+     until: "lsresults is not failed"
      delay: 10
      retries: 12

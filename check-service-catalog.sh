@@ -1,7 +1,7 @@
 for run in {1..10}; do
   productName=k8-$(cat /dev/urandom | LC_ALL=C tr -dc 'a-zA-Z0-9' | fold -w 8 | head -n 1)
   echo $productName
-  aws servicecatalog provision-product --product-id prod-atlpq6fmtowqc --provisioning-artifact-id pa-n5rtuy5zhduaa --provisioned-product-name $productName &>/dev/null
+  aws servicecatalog provision-product --product-id prod-atlpq6fmtowqc --provisioning-artifact-id pa-ykjowcpny23hq --provisioned-product-name $productName &>/dev/null
   
   while aws servicecatalog describe-provisioned-product --name $productName | jq .ProvisionedProductDetail.Status -r | grep UNDER_CHANGE &>/dev/null; do
     sleep 10
