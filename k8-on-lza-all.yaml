@@ -19,28 +19,52 @@
        name: apt-transport-https
        state: present
 
+   - name: Wait for /var/lib/dpkg/lock-frontend to be released 
+     shell: while lsof /var/lib/dpkg/lock-frontend ; do sleep 10; done;
+
+   - name: Wait for /var/lib/apt/lists/lock to be released 
+     shell: while lsof /var/lib/apt/lists/lock ; do sleep 10; done;
+
    - name: Add Kubernetes apt-key for APT repository
      apt_key:
        url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
        state: present
+
+   - name: Wait for /var/lib/dpkg/lock-frontend to be released 
+     shell: while lsof /var/lib/dpkg/lock-frontend ; do sleep 10; done;
+
+   - name: Wait for /var/lib/apt/lists/lock to be released 
+     shell: while lsof /var/lib/apt/lists/lock ; do sleep 10; done;
 
    - name: Add Kubernetes APT repository
      apt_repository:
       repo: deb http://apt.kubernetes.io/ kubernetes-xenial main
       state: present
       filename: 'kubernetes'
+     register: lsresult
+     until: "lsresult is not failed"
+     delay: 10
+     retries: 12
 
    - name: Kubelet Install
      apt:
        name: kubelet
        state: present
        update_cache: true
+     register: lsresult
+     until: "lsresult is not failed"
+     delay: 10
+     retries: 12
 
    - name: Kubeadm Install
      apt:
        name: kubeadm
        state: present
        update_cache: true
+     register: lsresult
+     until: "lsresult is not failed"
+     delay: 10
+     retries: 12
 
 ## Install cri-dockerd as Docker Engine shim for Kubernetes
       
