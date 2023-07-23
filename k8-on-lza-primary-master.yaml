@@ -35,6 +35,8 @@
      args:
       chdir: /root/
       creates: cluster.txt
+     register: lsresult
+     until: "lsresult is not failed"
      delay: 10
      retries: 12
   

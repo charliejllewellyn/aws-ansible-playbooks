@@ -49,6 +49,8 @@
 
    - name: Join the master node to cluster
      command: sh /tmp/join_command.sh
+     register: lsresult
+     until: "lsresult is not failed"
      delay: 10
      retries: 12
 
