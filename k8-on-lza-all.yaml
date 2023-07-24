@@ -73,6 +73,10 @@
       url: https://api.github.com/repos/Mirantis/cri-dockerd/releases/latest
       timeout: 10
      register: cri_dockerd_latest
+     register: lsresult
+     until: "lsresult is not failed"
+     delay: 10
+     retries: 12
 
    - debug:
       var: cri_dockerd_latest.json.tag_name
@@ -81,6 +85,10 @@
      get_url:
         url: https://github.com/Mirantis/cri-dockerd/releases/download/{{ cri_dockerd_latest.json.tag_name }}/cri-dockerd-{{ cri_dockerd_latest.json.tag_name | replace('v','') }}.amd64.tgz
         dest: /home/ubuntu
+     register: lsresult
+     until: "lsresult is not failed"
+     delay: 10
+     retries: 12
 
    - name: Extract cri_dockerd
      ansible.builtin.unarchive:
@@ -88,6 +96,10 @@
         dest: /usr/local/bin/
         extra_opts: [--strip-components=1]
         remote_src: yes
+     register: lsresult
+     until: "lsresult is not failed"
+     delay: 10
+     retries: 12
 
    - name: systemd units for cri-dockerd - cri-docker.service
      get_url:
@@ -98,33 +110,59 @@
      get_url:
         url: https://raw.githubusercontent.com/Mirantis/cri-dockerd/master/packaging/systemd/cri-docker.socket
         dest: /etc/systemd/system/
+     register: lsresult
+     until: "lsresult is not failed"
+     delay: 10
+     retries: 12
 
    - name: Configure systemd for cri-dockerd
      replace: 
         path: /etc/systemd/system/cri-docker.service
         regexp: "/usr/bin/cri-dockerd"
         replace: "/usr/local/bin/cri-dockerd"
+     register: lsresult
+     until: "lsresult is not failed"
+     delay: 10
+     retries: 12
 
    - name: Just force systemd to reread configs (2.4 and above)
      ansible.builtin.systemd:
         daemon_reload: yes
+     register: lsresult
+     until: "lsresult is not failed"
+     delay: 10
+     retries: 12
 
    - name: Start and Enable the cri-dockerd service - cri-docker.service
      ansible.builtin.systemd:
       name: cri-docker.service
       state: started
       enabled: yes
+     register: lsresult
+     until: "lsresult is not failed"
+     delay: 10
+     retries: 12
 
    - name: Start and Enable the cri-dockerd service - cri-docker.socket
      ansible.builtin.systemd:
       name: cri-docker.socket
       state: started
       enabled: yes
+     register: lsresult
+     until: "lsresult is not failed"
+     delay: 10
+     retries: 12
 
    - name: Install Ansible AWS tools
      shell: ansible-galaxy collection install amazon.aws
-     register: result
+     register: lsresult
+     until: "lsresult is not failed"
+     delay: 10
+     retries: 12
 
    - name: Install boto3
      shell: pip3 install boto3
-     register: result
+     register: lsresult
+     until: "lsresult is not failed"
+     delay: 10
+     retries: 12

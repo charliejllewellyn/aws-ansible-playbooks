@@ -20,6 +20,8 @@
        name: kubectl
        state: present
        force: yes
+     register: lsresult
+     until: "lsresult is not failed"
      delay: 10
      retries: 12
 
@@ -29,6 +31,8 @@
        object: join_command
        dest: /tmp/join_command.sh
        mode: get
+     register: lsresult
+     until: "lsresult is not failed"
      delay: 10
      retries: 12
 
@@ -36,6 +40,8 @@
      ansible.builtin.file:
        path: /tmp/join_command.sh
        mode: '0777'
+     register: lsresult
+     until: "lsresult is not failed"
      delay: 10
      retries: 12
 
@@ -44,6 +50,8 @@
       path: /tmp/join_command.sh
       regexp: "--token"
       replace: "--cri-socket='/run/cri-dockerd.sock' --token"
+     register: lsresult
+     until: "lsresult is not failed"
      delay: 10
      retries: 12
 
@@ -57,8 +65,6 @@
    - name: Sleep for 20 seconds
      wait_for:
       timeout: 20
-     delay: 10
-     retries: 12
 
    - name: Create .kube directory
      become: yes
@@ -67,6 +73,8 @@
        path: $HOME/.kube
        state: directory
        mode: 0755
+     register: lsresult
+     until: "lsresult is not failed"
      delay: 10
      retries: 12
 
@@ -74,6 +82,7 @@
      stat:
        path: /etc/kubernetes/admin.conf
      register: k8s_conf
+     until: "k8s_conf is not failed"
      delay: 10
      retries: 12
 
@@ -84,5 +93,7 @@
        remote_src: yes
        owner: ubuntu
      when: k8s_conf.stat.exists
+     register: lsresult
+     until: "lsresult is not failed"
      delay: 10
      retries: 12

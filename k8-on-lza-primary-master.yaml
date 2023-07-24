@@ -30,6 +30,8 @@
        name: kubectl
        state: present
        force: yes
+     register: lsresult
+     until: "lsresult is not failed"
      delay: 10
      retries: 12
 
