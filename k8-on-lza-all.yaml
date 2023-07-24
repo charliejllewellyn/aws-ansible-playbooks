@@ -73,8 +73,7 @@
       url: https://api.github.com/repos/Mirantis/cri-dockerd/releases/latest
       timeout: 10
      register: cri_dockerd_latest
-     register: lsresult
-     until: "lsresult is not failed"
+     until: "cri_dockerd_latest is not failed"
      delay: 10
      retries: 12
 
